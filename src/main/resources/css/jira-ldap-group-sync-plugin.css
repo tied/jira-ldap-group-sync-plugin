@@ -29,16 +29,52 @@
     background-position: 50% 50%;
 }
 
+.adskldapsync_add {
+    background-image: url('images/file_add.png');
+    background-repeat: no-repeat;
+    background-size: 100%;
+    height: 24px;
+    width: 24px;
+    display: inline-block;
+    margin-left: 2px;
+    vertical-align: middle;
+    background-position: 50% 50%;
+}
+
+.adskldapsync_run {
+    background-image: url('images/play.png');
+    background-repeat: no-repeat;
+    background-size: 100%;
+    height: 24px;
+    width: 24px;
+    display: inline-block;
+    margin-left: 2px;
+    vertical-align: middle;
+    background-position: 50% 50%;
+}
+
+.adskldapsync_run_all {
+    background-image: url('images/play_all.png');
+    background-repeat: no-repeat;
+    background-size: 100%;
+    height: 24px;
+    width: 24px;
+    display: inline-block;
+    margin-left: 2px;
+    vertical-align: middle;
+    background-position: 50% 50%;
+}
+
 .adskldapsync_recache {
-    background-image: url('images/cache.gif');
+    background-image: url('images/settings.png');
     background-repeat: no-repeat;
     background-size: 100%;
     height: 24px;
     width: 24px;    
-    display: inline;
+    display: inline-block;
+    margin-left: 2px;
     vertical-align: middle;
     background-position: 50% 50%;
-    float: right;
 }
 
 .adskldapsync_schedule {
@@ -47,43 +83,45 @@
     background-size: 100%;
     height: 24px;
     width: 24px;    
-    display: inline;
+    display: inline-block;
+    margin-left: 2px;
     vertical-align: middle;
     background-position: 50% 50%;
-    float: right;
 }
 
 .adskldapsync_config_edit {
-    background-image: url('images/cache.gif');
+    background-image: url('images/settings.png');
     background-repeat: no-repeat;
     background-size: 100%;
     height: 24px;
     width: 24px;    
-    display: inline;
+    display: inline-block;
+    margin-left: 2px;
     vertical-align: middle;
     background-position: 50% 50%;
-    float: right;
 }
 
 .adskldapsync_edit {
-    background-image: url('images/edit.png');
+    background-image: url('images/settings.png');
     background-repeat: no-repeat;
     background-size: 100%;
     height: 24px;
     width: 24px;    
-    display: inline;
+    display: inline-block;
+    margin-left: 2px;
     vertical-align: middle;
     background-position: 50% 50%;
     float: right;
 }
 
 .adskldapsync_delete {
-    background-image: url('images/delete.png');
+    background-image: url('images/remove.png');
     background-repeat: no-repeat;
     background-size: 100%;
     height: 24px;
     width: 24px;    
-    display: inline;
+    display: inline-block;
+    margin-left: 2px;
     vertical-align: middle;
     background-position: 50% 50%;
     float: right;
@@ -104,19 +142,18 @@
     float: right;
     border-radius: 3px;
     background-color: green;
-    height: 15px;
+    padding: 2px;
     color: #fff;
-    padding: 5px;
-    margin: 2px;
 }
 
 .adskldapsyncconfig_search_div {
     border-radius: 2px;
     display: inline;
-    float: right;
-    margin: 2px;
+    /*float: right;*/
 }
 
 .adskldapsyncconfig_search_div input {    
-    height: 20px;
+    height: 16px;
+    padding: 2px;
+    width: 250px;
 }

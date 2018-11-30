@@ -5,8 +5,13 @@
     <meta name="decorator" content="atl.admin" />
     $webResourceManager.requireResource("com.adsk.jira.ldapgroupsync.plugin.jira-ldap-group-sync-plugin:jira-ldap-group-sync-plugin-resources")
     <script>
+        function prepareRunAll() {
+            AJS.$("#ldapGroupSyncRun").stop().slideUp();
+            AJS.$("#ldapGroupSyncRunConfirm").stop().slideDown();
+        }
         function prepareRun() {
-            AJS.$("#runStatus").html("Running").stop().show();
+            AJS.$("#ldapGroupSyncRunConfirm").stop().slideUp();
+            AJS.$("#ldapGroupSyncRun").stop().slideDown();
         }
     </script>
 </head>
@@ -14,9 +19,19 @@
 
 
 <p>
+    <a class="aui-button" href="LdapGroupSyncMapAction.jspa">Back to Manage LDAP Group Sync</a>
+<p>
+
+<p>
 <span class="adskldapsync_heading">$i18n.getText("jira.ldap.group.sync.run.option.label")</span>
 <a href="https://github.com/Autodesk/jira-ldap-group-sync-plugin/wiki/Run-On-demand-Sync" target="_blank"
     class="adskldapsync_question" title="LDAP On-demand Group Sync Documentation"></a>
+
+<a class="adskldapsync_run_all" href="#" onClick="prepareRunAll()" 
+    title="Run ALL LDAP and JIRA Groups Sync"></a>
+
+<a class="adskldapsync_run" href="#" onClick="prepareRun()" 
+    title="Run Ondemand LDAP and JIRA Groups Sync"></a>
 </p>
 
 <div id="ldapGroupSyncRun">
@@ -26,8 +41,8 @@
         $i18n.getText("jira.ldap.group.sync.run.option.ldap_group.label"):
         <span class="aui-icon icon-required"></span>
     </label>
-    <input type="text" id="ldapGroup" name="ldapGroup" class="text long-field" />
-    <div class="description">$i18n.getText("jira.ldap.group.sync.run.option.ldap_group.description")</div>
+    <input type="text" id="ldapGroup" name="ldapGroup" class="text long-field" required/>
+    <div class="description">$i18n.getText("jira.ldap.group.sync.run.option.ldap_group.description")</div>    
 </div>
 
 <div class="field-group">
@@ -35,19 +50,31 @@
         $i18n.getText("jira.ldap.group.sync.run.option.jira_group.label"):
         <span class="aui-icon icon-required"></span>
     </label>
-    <input type="text" id="jiraGroup" name="jiraGroup" class="text long-field" />
+    <input type="text" id="jiraGroup" name="jiraGroup" class="text long-field" required/>
     <div class="description">$i18n.getText("jira.ldap.group.sync.run.option.jira_group.description")</div>
 </div>
 
 <div class="aui-buttons">
-    <input class="aui-button" type="submit" name="submitted" value="Run &rarr;" onClick="prepareRun();"/>
+    <input class="aui-button aui-button-primary" type="submit" name="submitted" value="Run"/>
+</div>
+</form>
+</div>
+
+
+<div id="ldapGroupSyncRunConfirm" style="display: none;">
+<form id="admin" class="aui" method="post" action="/secure/LdapGroupSyncRunAction.jspa" >
+<p class="aui-message">Confirm to trigger sync for all the auto sync group mappings!</p>
+<div class="aui-buttons">
+    <input class="aui-button aui-button-primary" type="submit" name="submitted" value="Confirm"/>
 </div>
 </form>
 </div>
 
 
 <!-- config status -->
-<p id="runStatus" style="background-color:#E0FFFF;">$!status</p>
+#if( $!status )
+    <p class="aui-message">$!status</p>
+#end
 
 </body>
 </html>

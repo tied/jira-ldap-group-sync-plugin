@@ -5,6 +5,7 @@ import com.adsk.jira.ldapgroupsync.plugin.api.LdapGroupSyncAOMgr;
 import com.atlassian.jira.permission.GlobalPermissionKey;
 import com.atlassian.jira.web.action.JiraWebActionSupport;
 import com.adsk.jira.ldapgroupsync.plugin.model.LdapGroupSyncBean;
+import com.adsk.jira.ldapgroupsync.plugin.model.LdapGroupSyncMapBean;
 import com.adsk.jira.ldapgroupsync.plugin.model.MessageBean;
 import java.util.HashSet;
 import java.util.Set;
@@ -19,7 +20,7 @@ public class LdapGroupSyncRunAction extends JiraWebActionSupport {
     
     private static final long serialVersionUID = 1L;
     private static final Logger logger = Logger.getLogger(LdapGroupSyncRunAction.class);
-    private final LdapGroupSyncBean configBean = new LdapGroupSyncBean();    
+    private final LdapGroupSyncBean configBean = new LdapGroupSyncBean();
     private String submitted;
     private String status;
     
@@ -27,6 +28,7 @@ public class LdapGroupSyncRunAction extends JiraWebActionSupport {
     
     private final LdapGroupSyncAOMgr ldapGroupSyncMgr;
     private final LDAPGroupSyncUtil ldapGroupSyncUtil;
+    
     public LdapGroupSyncRunAction(LdapGroupSyncAOMgr ldapGroupAoMgr, LDAPGroupSyncUtil ldapGroupSyncUtil) {
         this.ldapGroupSyncMgr = ldapGroupAoMgr;
         this.ldapGroupSyncUtil = ldapGroupSyncUtil;
@@ -44,7 +46,7 @@ public class LdapGroupSyncRunAction extends JiraWebActionSupport {
             return "error";
         }
         
-        if (this.submitted != null) {
+        if (this.submitted != null && "Run".equals(this.submitted)) {
             String ldapGroup = configBean.getLdapGroup();
             String jiraGroup = configBean.getJiraGroup();
             
@@ -52,33 +54,29 @@ public class LdapGroupSyncRunAction extends JiraWebActionSupport {
             
             if(ldapGroup != null && !"".equals(ldapGroup) && jiraGroup != null && !"".equals(jiraGroup)) {
                 if(!defaultJiraGroups.contains(jiraGroup.toLowerCase()) ) {
-                    if(ldapGroupSyncMgr.isJiraGroupNotInSupport(jiraGroup) == true) {
-                        status = "This JIRA group ("+jiraGroup+") is configured not to support. Skipping!";
-                    }else{
-                        status = "Running.";
-                        
-                        LdapContext ctx = null;        
+                    status = "Running.";
+
+                    LdapContext ctx = null;        
+                    try {
+                        long startTime = System.currentTimeMillis();
+
+                        ctx = ldapGroupSyncUtil.getLdapContext();
+
+                        MessageBean result = ldapGroupSyncUtil.sync(ctx, ldapGroup.trim(), jiraGroup.trim());
+
+                        long totalTime = System.currentTimeMillis() - startTime;                
+                        logger.info(result.getMessage() +". Took "+ totalTime/ 1000d +" Seconds");
+
+                        result.setMessage(result.getMessage() +". Took "+ totalTime/ 1000d +" Seconds");
+                        status = result.getMessage();
+
+                    } finally {
                         try {
-                            long startTime = System.currentTimeMillis();
-                            
-                            ctx = ldapGroupSyncUtil.getLdapContext();
-                            
-                            MessageBean result = ldapGroupSyncUtil.sync(ctx, ldapGroup.trim(), jiraGroup.trim());
-
-                            long totalTime = System.currentTimeMillis() - startTime;                
-                            logger.info(result.getMessage() +". Took "+ totalTime/ 1000d +" Seconds");
-
-                            result.setMessage(result.getMessage() +". Took "+ totalTime/ 1000d +" Seconds");
-                            status = result.getMessage();
-                        
-                        } finally {
-                            try {
-                                if(ctx != null) ctx.close();
-                            } catch (NamingException e) {
-                                logger.error(e);
-                            }
+                            if(ctx != null) ctx.close();
+                        } catch (NamingException e) {
+                            logger.error(e);
                         }
-                    }
+                    }                    
                     
                 } else {
                     status = "This plugin does not support JIRA default group ("+jiraGroup+"). Skipping!";
@@ -88,6 +86,25 @@ public class LdapGroupSyncRunAction extends JiraWebActionSupport {
                 status = "Failed. Required fields are missing!";
             }
             
+        } else if(this.submitted != null && "Confirm".equals(this.submitted)) {
+            status = "Triggered ALL LDAP and JIRA Groups Sync..";
+            LdapContext ctx = null;
+            try {               
+                ctx = ldapGroupSyncUtil.getLdapContext();
+                for(LdapGroupSyncMapBean bean : ldapGroupSyncMgr.getGroupsMapProperties()) {
+                    MessageBean message = ldapGroupSyncUtil.sync(ctx, bean.getLdapGroup(), bean.getJiraGroup());
+                    logger.debug(message.getMessage());
+                    status = message.getMessage();
+                }
+            } catch (Exception e) {
+                status = "There are few LDAP and JIRA Groups Sync failures. "+ e.getLocalizedMessage();
+            } finally {
+                try {
+                    if(ctx != null) ctx.close();
+                } catch (NamingException e) {
+                    logger.error(e);
+                }
+            }
         }
         return "success";
     }
